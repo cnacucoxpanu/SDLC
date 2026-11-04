@@ -1,0 +1,28 @@
+@startuml state_booking
+' Диаграмма состояний брони (ADR-0007)
+skinparam shadowing false
+
+[*] --> ACTIVE : book
+
+state "ACTIVE\n«Активна»" as ACTIVE
+state "ISSUED\n«Выдана»" as ISSUED {
+  state "В срок" as OnTime
+  state "Просрочена" as Overdue
+  [*] --> OnTime
+  OnTime --> Overdue : when(to < сегодня)
+}
+state "RETURNED\n«Возвращена»" as RETURNED
+state "CANCELLED\n«Отменена»" as CANCELLED
+
+ISSUED : entry / issuedOn := сегодня
+RETURNED : entry / returnedOn := сегодня
+CANCELLED : entry / note := причина
+
+ACTIVE --> ISSUED : issue [from ≤ сегодня ≤ to,\nоборудование FREE]
+ISSUED --> RETURNED : accept
+ACTIVE --> CANCELLED : cancel
+ACTIVE --> CANCELLED : setStatus(IN_REPAIR)
+ACTIVE --> [*] : when(to < сегодня)\n«Завершена»
+RETURNED --> [*]
+CANCELLED --> [*]
+@enduml

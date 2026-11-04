@@ -1,0 +1,35 @@
+@startuml sequence_booking
+' Диаграмма последовательности: бронирование (UC-08, UC-09)
+skinparam shadowing false
+
+actor ":Студент" as S
+participant ":BookingDialog" as D
+participant ":BookingService" as B
+participant ":Store" as T
+
+S -> D : ввести даты, «Забронировать»
+activate D
+D -> B : book(student, equipmentId, from, to)
+activate B
+B -> T : equipment(), bookings()
+activate T
+T --> B : списки
+deactivate T
+ref over B, T : UC-09 Проверить правила брони
+alt правила выполнены
+  create participant "b:Booking" as X
+  B -->> X : «create»
+  B -> T : bookings().add(b)
+  activate T
+  B -> T : save()
+  T --> B
+  deactivate T
+  B --> D : b
+  D --> S : форма закрыта, сообщение об успехе
+else правило нарушено
+  B --> D : BusinessException(причина)
+  deactivate B
+  D --> S : причина отказа в форме
+end
+deactivate D
+@enduml

@@ -1,0 +1,14 @@
+@startuml state_equipment
+' Диаграмма состояний оборудования (ADR-0006)
+skinparam shadowing false
+
+state "FREE\n«Свободно»" as FREE
+state "IN_REPAIR\n«В ремонте»" as IN_REPAIR
+
+[*] --> FREE : add
+FREE --> FREE : update
+FREE --> IN_REPAIR : toRepair [нет выданных броней]\n/ отменить активные брони
+IN_REPAIR --> FREE : backInService
+FREE --> [*] : delete [нет действующих броней]
+IN_REPAIR --> [*] : delete [нет действующих броней]
+@enduml

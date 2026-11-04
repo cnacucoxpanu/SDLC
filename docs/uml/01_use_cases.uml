@@ -1,0 +1,46 @@
+@startuml use_cases
+' Диаграмма вариантов использования. Описания — в use-cases.md
+left to right direction
+skinparam shadowing false
+
+actor "Студент" as Student
+actor "Пользователь" as User
+actor "Лаборант" as Lab
+Student --|> User
+Lab --|> User
+
+rectangle "Учет лабораторного оборудования" {
+  usecase "UC-01 Войти в систему" as UC01
+  usecase "UC-02 Просмотреть каталог" as UC02
+  usecase "UC-03 Найти и отфильтровать\nоборудование" as UC03
+  usecase "UC-04 Добавить или изменить\nоборудование" as UC04
+  usecase "UC-05 Удалить оборудование" as UC05
+  usecase "UC-06 Изменить статус\nоборудования" as UC06
+  usecase "UC-07 Отменить брони\nпри ремонте" as UC07
+  usecase "UC-08 Забронировать\nоборудование" as UC08
+  usecase "UC-09 Проверить правила брони" as UC09
+  usecase "UC-10 Просмотреть брони" as UC10
+  usecase "UC-11 Отменить бронь" as UC11
+  usecase "UC-12 Отметить выдачу" as UC12
+  usecase "UC-13 Принять возврат" as UC13
+  usecase "UC-14 Просмотреть журнал" as UC14
+  usecase "UC-15 Экспортировать в CSV" as UC15
+}
+
+User --> UC01
+User --> UC02
+User --> UC10
+User --> UC11
+Student --> UC08
+Lab --> UC04
+Lab --> UC05
+Lab --> UC06
+Lab --> UC12
+Lab --> UC13
+Lab --> UC14
+Lab --> UC15
+
+UC08 ..> UC09 : <<include>>
+UC03 ..> UC02 : <<extend>>
+UC07 ..> UC06 : <<extend>>
+@enduml
