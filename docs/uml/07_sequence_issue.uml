@@ -1,12 +1,15 @@
 @startuml sequence_issue
 ' Диаграмма последовательности: выдача и возврат (UC-12, UC-13). Реализация запланирована на I3–I4
 skinparam shadowing false
+hide footbox
 
-actor ":Лаборант" as L
+participant ":Лаборант" as L
 participant ":JournalPanel" as J
 participant ":IssueService" as I
 participant ":Store" as T
+participant "b:Booking" as X
 
+activate L
 L -> J : «Выдать»
 activate J
 J -> I : issue(actor, bookingId)
@@ -14,29 +17,26 @@ activate I
 I -> T : bookings(), equipment()
 activate T
 T --> I : списки
-deactivate T
-alt выдача разрешена
-  I -> T : replaceBooking(b.issued(сегодня))
-  I -> T : save()
-  I --> J : b
-  J --> L : статус «Выдана»
-else отказ
-  I --> J : BusinessException(причина)
-  J --> L : причина отказа
-end
-deactivate I
-deactivate J
+I -> I : проверить период и статус
+I -> X : issued(сегодня)
+activate X
+X --> I
+I -> T : replaceBooking(b), save()
+T --> I
+I --> J : b
+J --> L : статус «Выдана»
 
 L -> J : «Принять»
-activate J
 J -> I : accept(actor, bookingId)
-activate I
-opt бронь выдана
-  I -> T : replaceBooking(b.returned(сегодня))
-  I -> T : save()
-end
+I -> X : returned(сегодня)
+X --> I
+destroy X
+I -> T : replaceBooking(b), save()
+T --> I
+destroy T
 I --> J : b
-deactivate I
+destroy I
 J --> L : статус «Возвращена»
-deactivate J
+destroy J
+destroy L
 @enduml
